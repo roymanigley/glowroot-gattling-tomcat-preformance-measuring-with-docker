@@ -1,0 +1,17 @@
+version: '2'
+services:
+  mysql_db:
+    build: mysql
+    command: --init-file /tmp/sql/init.sql
+    environment:
+        MYSQL_ROOT_PASSWORD: secret
+  tomcat:
+    build: 'tomcat'
+    ports:
+        - 9010:9010
+        - 8080:8080
+        - 4040:4040
+    environment:
+        - "JAVA_OPTS=-javaagent:/opt/glowroot/glowroot.jar -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9010 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Xmx1024m -Xss4096k"
+    depends_on:
+      - mysql_db

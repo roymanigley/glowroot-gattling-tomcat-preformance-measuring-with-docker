@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+
+<!-- <h:outputStylesheet value="#{resource['primefaces-my-theme:theme.css']}" /> -->
+</h:head>
+<h:body>
+
+<style>
+/* body {
+	background: url("http://localhost:8080/javax.faces.resource/images/ui-icons_777777_256x240.png.jsf?ln=primefaces-my-theme")
+} */
+</style>
+	<p:growl 
+		id="growl" 
+		sticky="false"
+		life="3000"
+		autoUpdate="false"
+		showDetail="true" />
+	
+	<p:panelGrid 
+		columns="1" 
+		style="margin: auto;"
+		styleClass="ui-noborder">
+		
+		<h:outputText 
+			value="Dummy data" 
+			style="font-size:36px;" />
+	</p:panelGrid>
+	
+	<h:form>
+	
+		<p:panelGrid 
+			columns="2" 
+			id="grid" 
+			style="margin: auto;"
+			styleClass="ui-noborder">
+		
+			<h:outputText 
+				value="Result Size" />
+			
+			<p:inputNumber
+				disabled="true"
+				thousandSeparator="'"
+				decimalPlaces="0" 
+				value="#{dummyBean.resultSize}" />
+	
+			<p:commandButton 
+				onclick="PF('dialog').show();" 
+				icon="ui-icon-check"
+				value="show Dummies"
+				immediate="true"
+				partialSubmit="true"/>
+			
+			<p:commandButton 
+				actionListener="#{dummyBean.createTestDummies(10000)}"
+				update="grid"
+				icon="ui-icon-plus"
+				value="create 10'000 dummies"
+				immediate="true"
+				process="@this"
+				onclick="PF('blockAll').show()"
+				oncomplete="PF('blockAll').hide()"
+				partialSubmit="true"/>
+		
+		</p:panelGrid>
+	</h:form>
+
+	<p:dialog 
+		widgetVar="blockAll"
+		closable="false"
+		modal="true"
+		resizable="false"
+		appendTo="@(body)"
+		header="loading...">
+		
+		<p:panelGrid 
+			columns="1" 
+			style="width:100%;text-align:center;"
+			styleClass="ui-noborder">
+			
+			<p:graphicImage 
+				value="resources/images/loader.gif" />
+
+		</p:panelGrid>
+	</p:dialog>
+			
+	<p:dialog
+		dynamic="true" 
+		width="500"
+		widgetVar="dialog"
+		id="dialog"
+		draggable="false"
+		modal="true"
+		appendTo="@(body)"
+		header="Dummies">
+		
+		<h:form rendered="true">
+			<p:dataTable
+				widgetVar="dummyTable"
+				id="dummyTable" 
+				var="r" 
+				value="#{dummyBean.lazyScrollingModel}" 
+				scrollRows="20" 
+				scrollable="true" 
+				liveScroll="true" 
+				scrollHeight="200" 
+				lazy="true" 
+				rows="40"
+				selectionMode="single" 
+				selection="#{dummyBean.selected}"
+				rowKey="#{r.id}">
+				
+				<p:ajax 
+					event="rowSelect"
+					immediate="true"
+					async="true"
+					partialSubmit="true" 
+					listener="#{dummyBean.onRowSelect}"
+					update="growl" />
+				<p:ajax 
+					event="sort" 
+					immediate="true"
+					onstart="PF('blockAll').show();"
+					oncomplete="PF('blockAll').hide();" />
+				<p:ajax 
+					event="filter" 
+					immediate="true"
+					onstart="PF('blockAll').show();"
+					oncomplete="PF('blockAll').hide();" />
+				<p:ajax 
+					event="page" 
+					immediate="true"
+					onstart="PF('blockAll').show();"
+					oncomplete="PF('blockAll').hide();" />
+				<!-- <f:facet name="header">
+		            <p:outputPanel>
+		                <h:outputText value="Search all fields:" />
+		                <p:inputText id="globalFilter" onkeyup="PF('dummyTable').filter()" style="width:150px" placeholder="Enter keyword"/>
+		            </p:outputPanel>
+		        </f:facet> -->
+	        	<p:column 
+	        		sortable="true"
+	        		sortBy="#{id}"
+	        		width="60">
+	        		<h:outputText value="#{r.id}" />
+	        	</p:column>
+	        	
+	        	<p:column 
+	        		sortable="true"
+	        		sortBy="#{name}"
+	        		filterable="true"
+	        		filterBy="#{name}"
+	        		filterStyle="width: 100%;"
+	        		filterPosition="top"
+	        		filterMatchMode="contains">
+	        		<h:outputText value="#{r.name}" />
+	        	</p:column>
+	
+			</p:dataTable>
+		</h:form>
+	</p:dialog>
+</h:body>
+</html>
